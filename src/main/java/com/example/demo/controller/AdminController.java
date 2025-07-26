@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 
-import org.springframework.security.crypto.password.PasswordEncoder;
+
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,8 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.dto.AuthRequest;
 import com.example.demo.entity.Usuario;
-import com.example.demo.entity.enums.Rol;
-import com.example.demo.repository.UsuarioRepository;
+
 import com.example.demo.services.IUsuarioService;
 
 
@@ -29,10 +28,7 @@ public class AdminController {
 
     @Autowired
     private IUsuarioService iService;
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-    @Autowired
-    private UsuarioRepository usuarioRepository;
+    
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/obtenerusuarios")
@@ -48,13 +44,8 @@ public class AdminController {
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/register")
     public ResponseEntity<String> register(@RequestBody AuthRequest request) {
-        Usuario nuevo = new Usuario();
-        nuevo.setEmail(request.getEmail());
-        nuevo.setUsername(request.getUsername());
-        nuevo.setPassword(passwordEncoder.encode(request.getPassword()));
-        nuevo.setRol(Rol.USER);
-        usuarioRepository.save(nuevo);
-        return ResponseEntity.ok("Usuario registrado");
+        
+        return ResponseEntity.ok(iService.register(request));
     }
 
 }
