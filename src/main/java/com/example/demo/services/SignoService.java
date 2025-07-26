@@ -52,6 +52,20 @@ public List<Signo> buscarPorQuery(String query) {
     return repository.findAll();
 }
 
+@Override
+public Optional<Signo> actualizar(Long id, SignoDTO dto) {
+    Signo signoExistente = repository.findById(id).orElse(null);
+    if (signoExistente != null) {
+        signoExistente.setPalabra(dto.getPalabra());
+        signoExistente.setCategoria(dto.getCategoria());
+        signoExistente.setDefinicion(dto.getDefinicion());
+        signoExistente.setLetra(dto.getLetra());
+        signoExistente.setUrls(dto.getUrls());
+        repository.save(signoExistente);
+        return Optional.of(signoExistente);
+    }
+    return Optional.empty();
+}
     
 }
 
