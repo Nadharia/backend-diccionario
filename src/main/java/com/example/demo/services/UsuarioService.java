@@ -31,9 +31,18 @@ public class UsuarioService implements IUsuarioService{
         nuevo.setEmail(request.getEmail());
         nuevo.setUsername(request.getUsername());
         nuevo.setPassword(passwordEncoder.encode(request.getPassword()));
-        nuevo.setRol(Rol.USER);
+        nuevo.setRol(Rol.ADMIN);
         usuarioRepository.save(nuevo);
         return "Usuario registrado";
+    }
+    @Override
+    public String deleteUsuario(Long id) {
+        if (usuarioRepository.existsById(id)) {
+            usuarioRepository.deleteById(id);
+            return "Usuario eliminado";
+        } else {
+            return "Usuario no encontrado";
+        }
     }
     
 

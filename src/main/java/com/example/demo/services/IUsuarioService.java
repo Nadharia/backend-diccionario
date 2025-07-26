@@ -10,4 +10,6 @@ public interface IUsuarioService {
     List<Usuario> obtenerUsuarios(); // Usá camelCase con mayúscula intermedia
 
     String register(AuthRequest request);
+
+    String deleteUsuario(Long id);
 }
