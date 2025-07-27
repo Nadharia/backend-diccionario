@@ -34,6 +34,10 @@ public Optional<Signo> guardar(SignoDTO dto) {
     }
 }
 
+public void eliminar(Long id) {
+    repository.deleteById(id);
+}
+
 public Signo dtoToEntity(SignoDTO s) {
     Signo signo = new Signo();
     signo.setPalabra(s.getPalabra());

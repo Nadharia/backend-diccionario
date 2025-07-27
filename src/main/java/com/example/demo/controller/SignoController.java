@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import java.util.HashMap;
 import java.util.Map;
 import com.example.demo.dto.SignoDTO;
@@ -41,7 +43,9 @@ public class SignoController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+
     @PostMapping
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Map<String, Object>> guardar(@RequestBody SignoDTO dto) {
         return service.guardar(dto).map(signoGuardado -> {
             Map<String, Object> respuesta = new HashMap<>();
@@ -55,9 +59,10 @@ public class SignoController {
         });
     }
 
+    // Accesible para usuarios autenticados
     @PatchMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Map<String, Object>> actualizar(@PathVariable Long id, @RequestBody SignoDTO dto) {
-        System.out.println("entro y actualizo?");
         return service.actualizar(id, dto).map(signoActualizado -> {
             Map<String, Object> respuesta = new HashMap<>();
             respuesta.put("mensaje", "Actualizado con éxito");
@@ -68,6 +73,31 @@ public class SignoController {
             error.put("mensaje", "No se encontró el signo");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
         });
+    }
+
+    // Accesible para usuarios autenticados
+    @GetMapping("/obtenersignos")
+    @PreAuthorize("isAuthenticated()")
+    public List<Signo> obtenerTodosLosSignos(){
+        return service.buscarPorQuery("");
+    }
+
+    // Accesible para usuarios autenticados
+    @DeleteMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<Map<String, String>> eliminar(@PathVariable Long id) {
+        if (service.buscarPorId(id).isPresent()) {
+            service.eliminar(id);
+            Map<String, String> respuesta = new HashMap<>();
+            respuesta.put("mensaje", "Eliminado con éxito");
+            return ResponseEntity.ok(respuesta);
+        } else {
+            Map<String, String> error = new HashMap<>();
+            error.put("mensaje", "No se encontró el signo");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+        }
+    }
+    
 }
 
-}
+

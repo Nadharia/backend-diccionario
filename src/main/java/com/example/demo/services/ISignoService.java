@@ -14,5 +14,5 @@ public interface ISignoService {
     Optional<Signo>  guardar(SignoDTO dto);
     List<Signo> buscarPorQuery(String query);
     Optional<Signo> actualizar(Long id, SignoDTO dto);
-
+    void eliminar(Long id);
 }
