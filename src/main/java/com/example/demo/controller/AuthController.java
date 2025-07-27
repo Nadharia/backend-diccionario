@@ -15,6 +15,9 @@ import org.springframework.web.bind.annotation.*;
 import com.example.demo.config.JwtUtil;
 import com.example.demo.dto.AuthRequest;
 import com.example.demo.dto.LoginRequest;
+import com.example.demo.entity.Usuario;
+import com.example.demo.entity.enums.Rol;
+import com.example.demo.repository.UsuarioRepository;
 import com.example.demo.services.IUsuarioService;
 
 
@@ -33,6 +36,8 @@ public class AuthController {
     private  JwtUtil jwtUtil;
     @Autowired
     private IUsuarioService iService;
+    @Autowired
+    private UsuarioRepository usuarioRepository;
 
    
 
@@ -48,7 +53,9 @@ public class AuthController {
         Cookie cookie = jwtUtil.createJwtCookie(token);
         response.addCookie(cookie);
 
-        return ResponseEntity.ok(Map.of("message", "Login exitoso"));
+        Rol rol=iService.findByUser(request.getUsername());
+
+        return ResponseEntity.ok(Map.of("message", "Login exitoso","rol",rol.name()));
     }
 
 

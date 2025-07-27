@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.example.demo.dto.AuthRequest;
 import com.example.demo.entity.Usuario;
+import com.example.demo.entity.enums.Rol;
 
 public interface IUsuarioService {
 
@@ -12,4 +13,6 @@ public interface IUsuarioService {
     String register(AuthRequest request);
 
     String deleteUsuario(Long id);
+
+    Rol findByUser(String username);
 }
