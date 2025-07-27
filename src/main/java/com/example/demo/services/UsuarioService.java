@@ -1,7 +1,7 @@
 package com.example.demo.services;
 
 import java.util.List;
-
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -31,9 +31,30 @@ public class UsuarioService implements IUsuarioService{
         nuevo.setEmail(request.getEmail());
         nuevo.setUsername(request.getUsername());
         nuevo.setPassword(passwordEncoder.encode(request.getPassword()));
-        nuevo.setRol(Rol.USER);
+        nuevo.setRol(Rol.ADMIN);
         usuarioRepository.save(nuevo);
         return "Usuario registrado";
+    }
+    @Override
+    public String deleteUsuario(Long id) {
+        if (usuarioRepository.existsById(id)) {
+            usuarioRepository.deleteById(id);
+            return "Usuario eliminado";
+        } else {
+            return "Usuario no encontrado";
+        }
+    }
+    @Override
+    public Rol findByUser(String username) {
+        Optional<Usuario> usuarioOpt=usuarioRepository.findByUsername(username);
+        if (usuarioOpt.isEmpty()) {
+            throw new RuntimeException("El usuario no existe");
+        }
+        Usuario usuario=usuarioOpt.get();
+
+        Rol rol=usuario.getRol();
+        return rol;
+
     }
     
 
