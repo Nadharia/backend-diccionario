@@ -11,7 +11,8 @@ import com.example.demo.dto.SignoDTO;
 public interface ISignoService {
    
     Optional<Signo> buscarPorId(Long id);
-    String  guardar(SignoDTO dto);
+    Optional<Signo>  guardar(SignoDTO dto);
     List<Signo> buscarPorQuery(String query);
     Optional<Signo> actualizar(Long id, SignoDTO dto);
+
 }

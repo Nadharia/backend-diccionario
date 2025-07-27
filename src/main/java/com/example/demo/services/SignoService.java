@@ -25,9 +25,13 @@ public class SignoService implements ISignoService {
     }
 
     @Override
-public String guardar(SignoDTO s) {
-    repository.save(dtoToEntity(s));
-    return "Guardado con éxito";
+public Optional<Signo> guardar(SignoDTO dto) {
+    try {
+        Signo signo = repository.save(dtoToEntity(dto));
+        return Optional.of(signo); 
+    } catch (Exception e) {
+        return Optional.empty();
+    }
 }
 
 public Signo dtoToEntity(SignoDTO s) {
