@@ -18,7 +18,7 @@ public class SignoService implements ISignoService {
     private SignoRepository repository;
 
     @Autowired
-    private UsuarioService usuarioService;  // Inyección del servicio UsuarioService
+    private UsuarioService usuarioService;  
 
     @Override
     public Optional<Signo> buscarPorId(Long id) {
@@ -26,12 +26,22 @@ public class SignoService implements ISignoService {
     }
 
     @Override
-    public String guardar(SignoDTO s) {
-        repository.save(dtoToEntity(s));
-        // Usamos el log del UsuarioService
+
+public Optional<Signo> guardar(SignoDTO dto) {
+    try {
+        Signo signo = repository.save(dtoToEntity(dto));
         usuarioService.crearLog("GUARDAR_SIGNO", "Se guardó el signo: " + s.getPalabra());
-        return "Guardado con éxito";
+        return Optional.of(signo); 
+    } catch (Exception e) {
+        return Optional.empty();
     }
+}
+
+public void eliminar(Long id) {
+    repository.deleteById(id);
+}
+
+  
 
     public Signo dtoToEntity(SignoDTO s) {
         Signo signo = new Signo();
@@ -44,6 +54,23 @@ public class SignoService implements ISignoService {
         return signo;
     }
 
+
+@Override
+public Optional<Signo> actualizar(Long id, SignoDTO dto) {
+    Signo signoExistente = repository.findById(id).orElse(null);
+    if (signoExistente != null) {
+        signoExistente.setPalabra(dto.getPalabra());
+        signoExistente.setCategoria(dto.getCategoria());
+        signoExistente.setDefinicion(dto.getDefinicion());
+        signoExistente.setLetra(dto.getLetra());
+        signoExistente.setUrls(dto.getUrls());
+        repository.save(signoExistente);
+        return Optional.of(signoExistente);
+    }
+    return Optional.empty();
+}
+    
+
     @Override
     public List<Signo> buscarPorQuery(String query) {
         if (query != null && !query.isEmpty()) {
@@ -51,4 +78,5 @@ public class SignoService implements ISignoService {
         }
         return repository.findAll();
     }
+
 }

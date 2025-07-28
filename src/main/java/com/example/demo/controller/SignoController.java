@@ -6,12 +6,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import java.util.HashMap;
+import java.util.Map;
 import com.example.demo.dto.SignoDTO;
 import com.example.demo.entity.Signo;
 import com.example.demo.services.ISignoService;
@@ -37,9 +43,61 @@ public class SignoController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+
     @PostMapping
-    public ResponseEntity<String> guardar(@RequestBody SignoDTO dto) {
-        System.out.println("entro y guardo?");
-        return ResponseEntity.ok(service.guardar(dto));
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<Map<String, Object>> guardar(@RequestBody SignoDTO dto) {
+        return service.guardar(dto).map(signoGuardado -> {
+            Map<String, Object> respuesta = new HashMap<>();
+            respuesta.put("mensaje", "Guardado con éxito");
+            respuesta.put("signo", signoGuardado); 
+            return ResponseEntity.ok(respuesta);
+        }).orElseGet(() -> {
+            Map<String, Object> error = new HashMap<>();
+            error.put("mensaje", "Error al guardar el signo");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        });
     }
+
+    // Accesible para usuarios autenticados
+    @PatchMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<Map<String, Object>> actualizar(@PathVariable Long id, @RequestBody SignoDTO dto) {
+        return service.actualizar(id, dto).map(signoActualizado -> {
+            Map<String, Object> respuesta = new HashMap<>();
+            respuesta.put("mensaje", "Actualizado con éxito");
+            respuesta.put("signo", signoActualizado);
+            return ResponseEntity.ok(respuesta);
+        }).orElseGet(() -> {
+            Map<String, Object> error = new HashMap<>();
+            error.put("mensaje", "No se encontró el signo");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+        });
+    }
+
+    // Accesible para usuarios autenticados
+    @GetMapping("/obtenersignos")
+    @PreAuthorize("isAuthenticated()")
+    public List<Signo> obtenerTodosLosSignos(){
+        return service.buscarPorQuery("");
+    }
+
+    // Accesible para usuarios autenticados
+    @DeleteMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<Map<String, String>> eliminar(@PathVariable Long id) {
+        if (service.buscarPorId(id).isPresent()) {
+            service.eliminar(id);
+            Map<String, String> respuesta = new HashMap<>();
+            respuesta.put("mensaje", "Eliminado con éxito");
+            return ResponseEntity.ok(respuesta);
+        } else {
+            Map<String, String> error = new HashMap<>();
+            error.put("mensaje", "No se encontró el signo");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+        }
+    }
+    
 }
+
+
