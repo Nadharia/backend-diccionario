@@ -30,7 +30,7 @@ public class SignoService implements ISignoService {
 public Optional<Signo> guardar(SignoDTO dto) {
     try {
         Signo signo = repository.save(dtoToEntity(dto));
-        usuarioService.crearLog("GUARDAR_SIGNO", "Se guardó el signo: " + s.getPalabra());
+        usuarioService.crearLog("GUARDAR_SIGNO", "Se guardó el signo: " + dto.getPalabra());
         return Optional.of(signo); 
     } catch (Exception e) {
         return Optional.empty();
