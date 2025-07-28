@@ -17,7 +17,8 @@ public class SignoService implements ISignoService {
     @Autowired
     private SignoRepository repository;
 
-   
+    @Autowired
+    private UsuarioService usuarioService;  
 
     @Override
     public Optional<Signo> buscarPorId(Long id) {
@@ -25,9 +26,11 @@ public class SignoService implements ISignoService {
     }
 
     @Override
+
 public Optional<Signo> guardar(SignoDTO dto) {
     try {
         Signo signo = repository.save(dtoToEntity(dto));
+        usuarioService.crearLog("GUARDAR_SIGNO", "Se guardó el signo: " + s.getPalabra());
         return Optional.of(signo); 
     } catch (Exception e) {
         return Optional.empty();
@@ -38,27 +41,19 @@ public void eliminar(Long id) {
     repository.deleteById(id);
 }
 
-public Signo dtoToEntity(SignoDTO s) {
-    Signo signo = new Signo();
-    signo.setPalabra(s.getPalabra());
-    signo.setCategoria(s.getCategoria());
-    signo.setDefinicion(s.getDefinicion());
-    signo.setFechaAlta(LocalDateTime.now());
-    signo.setLetra(s.getLetra());
-    signo.setUrls(s.getUrls());
-    return signo;
-}
+  
 
-
-
-@Override
-public List<Signo> buscarPorQuery(String query) {
-    
-    if (query != null && !query.isEmpty()) {
-        return repository.findByPalabraContainingIgnoreCase(query);
+    public Signo dtoToEntity(SignoDTO s) {
+        Signo signo = new Signo();
+        signo.setPalabra(s.getPalabra());
+        signo.setCategoria(s.getCategoria());
+        signo.setDefinicion(s.getDefinicion());
+        signo.setFechaAlta(LocalDateTime.now());
+        signo.setLetra(s.getLetra());
+        signo.setUrls(s.getUrls());
+        return signo;
     }
-    return repository.findAll();
-}
+
 
 @Override
 public Optional<Signo> actualizar(Long id, SignoDTO dto) {
@@ -75,8 +70,13 @@ public Optional<Signo> actualizar(Long id, SignoDTO dto) {
     return Optional.empty();
 }
     
+
+    @Override
+    public List<Signo> buscarPorQuery(String query) {
+        if (query != null && !query.isEmpty()) {
+            return repository.findByPalabraContainingIgnoreCase(query);
+        }
+        return repository.findAll();
+    }
+
 }
-
-
-    
-    
